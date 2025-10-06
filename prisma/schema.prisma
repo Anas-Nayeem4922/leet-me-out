@@ -1,0 +1,44 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Level {
+  easy
+  medium
+  hard
+}
+
+enum Language {
+  CPP
+  JAVA
+  PYTHON
+  JAVASCRIPT
+  TYPESCRIPT
+  C
+}
+
+model User {
+  id                    String              @id @default(uuid())
+  username              String     
+  password              String
+  submissions           Submissions[]
+}
+
+model Submissions {
+  id                   Int               @id @default(autoincrement())
+  userId               String
+  name                 String
+  level                Level
+  status               String
+  submittedAt          DateTime          @default(now())
+  language             Language
+  topics               String
+  user                 User              @relation(fields: [userId], references: [id])
+}

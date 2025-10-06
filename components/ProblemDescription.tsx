@@ -1,9 +1,17 @@
+"use client"
+
 import { problems } from "@/utils/problems"
+import { usePathname, useRouter } from "next/navigation";
 
 export function ProblemDescription({id} : {id: number}) {
     const problem = problems[id - 1];
     const constraints: string[] = problem.constraints.split(",");
+    const router = useRouter();
+    const pathName = usePathname();
     return <div className="bg-amber-100 text-slate-900 max-w-[50%] min-h-screen p-4">
+        {/* Submission Section */}
+        <div onClick={() => router.push(`${pathName}/submissions`)} className="text-md font-bold bg-amber-50 px-2 py-1 rounded-md cursor-pointer inline mb-4">Submissions</div>
+
         {/* Problem Statement */}
         <div className="text-lg font-extrabold mb-5">{problem.id}. {problem.title}</div>
 

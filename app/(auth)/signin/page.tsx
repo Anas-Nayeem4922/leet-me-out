@@ -18,7 +18,7 @@ import { Loader2, LogIn } from "lucide-react"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { motion } from "framer-motion"
-import { authSchema } from "@/schema/authSchema"
+import { authSchema } from "@/schema/auth"
 import Splash3dButton from "@/components/ui/3d-splash-button"
 
 export default function Signin() {

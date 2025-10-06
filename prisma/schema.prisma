@@ -10,9 +10,9 @@ datasource db {
 }
 
 enum Level {
-  easy
-  medium
-  hard
+  Easy
+  Medium
+  Hard
 }
 
 enum Language {
@@ -39,6 +39,6 @@ model Submissions {
   status               String
   submittedAt          DateTime          @default(now())
   language             Language
-  topics               String
+  topics               String[]
   user                 User              @relation(fields: [userId], references: [id])
 }

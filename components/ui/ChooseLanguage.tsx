@@ -31,7 +31,7 @@ export function ChooseLanguage({language, setLanguage} : {
   },
   {
     value: "cpp",
-    label: "C++",
+    label: "CPP",
   },
   {
     value: "python",

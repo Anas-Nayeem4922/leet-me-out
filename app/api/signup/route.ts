@@ -1,5 +1,5 @@
 import { client } from "@/lib/prisma";
-import { authSchema } from "@/schema/authSchema";
+import { authSchema } from "@/schema/auth";
 
 import bcrypt from "bcryptjs";
 

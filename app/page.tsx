@@ -11,5 +11,6 @@ export default function Home() {
     {
       session.status === "authenticated" ? <Button onClick={() => {signOut()}}>Logout</Button> : <Button onClick={() => router.push("/signin")}>Signin</Button>
     }
+    <div onClick={() => router.push("/problemset")} className="font-bold underline text-amber-500 cursor-pointer">Check out the problems</div>
   </div>
 }

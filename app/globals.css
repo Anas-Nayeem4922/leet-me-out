@@ -46,6 +46,16 @@
   --color-d-fg: var(--d-fg);
   --color-d-muted: var(--d-muted);
   --color-d-bg: var(--d-bg);
+  --color-dark-green: #2cbb5d;
+  --color-dark-red: #ef4743;
+  --color-dark-gray: #262626;
+  --color-gray: #353535;
+  --color-black: #101010;
+  --color-text-gray: #9fa0a2;
+  --color-green-text: #46c6c2;
+  --color-yellow-text: #ffb700;
+  --color-red-text: #f63737;
+  --color-editor-black: #1e1e1e;
 }
 
 :root {

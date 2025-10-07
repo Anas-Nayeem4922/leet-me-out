@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { ChooseLanguage } from "./ui/ChooseLanguage";
-import Editor from "@monaco-editor/react"
+import Editor from "@monaco-editor/react";
 import { problems } from "@/utils/problems";
 import { Button } from "./ui/button";
 import { languageId } from "@/utils/language-id";
@@ -10,8 +10,15 @@ import axios from "axios";
 import { useSocket } from "@/hooks/SocketProvider";
 import { SubmissionDetails, SubmissionParameters } from "@/types/Submission";
 import { toast } from "sonner";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "./ui/resizable";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Code, CodeXml } from "lucide-react";
 
-export function CodeEditor({id} : {id: number}) {
+export function CodeEditor({ id }: { id: number }) {
     const [language, setLanguage] = useState<string>("java");
     const problem = problems[id - 1];
     const boilerplate: Record<string, string> = problem.boilerplate;
@@ -23,125 +30,226 @@ export function CodeEditor({id} : {id: number}) {
     const apiKey = process.env.NEXT_PUBLIC_RAPID_API_KEY;
     const apiHost = process.env.NEXT_PUBLIC_RAPID_API_HOST;
 
-    const handleSubmission = async(type: "run" | "submit") => {
-        const testcases = type == "run" ? problem.exampleTestcases : problem.sampleTestcases;
+    const handleSubmission = async (type: "run" | "submit") => {
+        const testcases =
+            type == "run" ? problem.exampleTestcases : problem.sampleTestcases;
         const submissions: SubmissionParameters[] = [];
-        testcases.forEach(c => submissions.push({
-            language_id: languageId.get(language) || 63,
-            source_code: code,
-            stdin: c.input,
-            expected_output: c.output,
-            cpu_time_limit: 2
-        }));
+        testcases.forEach((c) =>
+            submissions.push({
+                language_id: languageId.get(language) || 63,
+                source_code: code,
+                stdin: c.input,
+                expected_output: c.output,
+                cpu_time_limit: 2,
+            })
+        );
 
         const options = {
-            method: 'POST',
+            method: "POST",
             url: `https://${apiHost}/submissions/batch`,
             params: {
-                base64_encoded: 'false'
+                base64_encoded: "false",
             },
             headers: {
-                'x-rapidapi-key': apiKey,
-                'x-rapidapi-host': apiHost,
-                'Content-Type': 'application/json'
+                "x-rapidapi-key": apiKey,
+                "x-rapidapi-host": apiHost,
+                "Content-Type": "application/json",
             },
             data: {
-                submissions
-            }
+                submissions,
+            },
         };
 
         const response = await axios.request(options);
-        const tokens: string[] = response.data.map((t: {token: string}) => t.token);
-        if(socket) {
+        const tokens: string[] = response.data.map(
+            (t: { token: string }) => t.token
+        );
+        if (socket) {
             socket.send(tokens.join(","));
             socket.onmessage = (e) => {
                 try {
-                    const submissionResult: SubmissionDetails[] = JSON.parse(e.data);
-                    if(submissionResult) {
-                        type === "run" ? setRunResult(submissionResult) : setSubmitResult(submissionResult)
-                        if(type === "submit") {
+                    const submissionResult: SubmissionDetails[] = JSON.parse(
+                        e.data
+                    );
+                    if (submissionResult) {
+                        type === "run"
+                            ? setRunResult(submissionResult)
+                            : setSubmitResult(submissionResult);
+                        if (type === "submit") {
                             let status = true;
-                            submissionResult.forEach(s => {
-                                if(s.status != "Accepted") status = false;
-                            })
-                            createSubmission(status)
+                            submissionResult.forEach((s) => {
+                                if (s.status != "Accepted") status = false;
+                            });
+                            createSubmission(status);
                         }
                     }
-                } catch(err) {
+                } catch (err) {
                     toast.error("Error in submitting code");
                 }
-            }
+            };
         }
-    }
+    };
 
-    const createSubmission = async(status: boolean) => {
+    const createSubmission = async (status: boolean) => {
         const response = await axios.post("/api/submission", {
             language: language.toUpperCase(),
             name: problem.title,
             level: problem.level,
             status: status ? "Accepted" : "Rejected",
-            topics: problem.topics
-        })
+            topics: problem.topics,
+        });
         console.log(response.data);
-    }
+    };
 
     useEffect(() => {
         setCode(boilerplate[language]);
-    }, [language])
+    }, [language]);
 
-    return <div>
-        <ChooseLanguage language={language} setLanguage={setLanguage}/>
-        <div className="flex flex-col">
-            <Editor
-                className="mt-4 mb-8"
-                language={language}
-                value={code}
-                width={"50vw"}
-                height={"50vh"}
-                onChange={(v) => setCode(v || "")}
-                options={{
-                    fontSize: 16,
-                    minimap: {
-                        enabled: false
-                    },
-                    hover: {
-                        enabled: false
-                    },
-                    quickSuggestions: false,          
-                    parameterHints: { enabled: false },
-                    suggestOnTriggerCharacters: false, 
-                    acceptSuggestionOnEnter: "off",
-                    tabCompletion: "off",              
-                    wordBasedSuggestions: "off",   
-                    suggest: { snippetsPreventQuickSuggestions: false },
-                    inlineSuggest: { enabled: false },
-                }}
-            />
-            <div className="flex justify-end pr-5 gap-5 items-center">
-                <Button className="cursor-pointer" onClick={() => handleSubmission("run")}>Run</Button>
-                <Button className="cursor-pointer" onClick={() => handleSubmission("submit")}>Submit</Button>
+    return (
+        <div className='h-screen flex flex-col bg-editor-black rounded-xl'>
+            <div className='min-w-full max-h-[42px] px-6 bg-gray flex justify-between items-center rounded-t-xl mb-4'>
+                <div className='flex items-center gap-2 '>
+                    <Code className='h-6 w-6 text-dark-green' />
+                    <span className='text-white font-bold'>Code</span>
+                </div>
+                <div>
+                    <ChooseLanguage
+                        language={language}
+                        setLanguage={setLanguage}
+                    />
+                </div>
             </div>
-            {
-                problem.exampleTestcases.map((p, idx) => (
-                    <div key={idx}>
-                        <p className="text-lg font-bold">Case {idx + 1}</p>
-                        <p>{runResult && runResult[idx].status}</p>
-                        <p>{p.normalIO.input}</p>
-                        {
-                            runResult && runResult[idx].compile_output != null ? 
-                            <div>
-                                <p className="whitespace-pre">{runResult[idx].compile_output}</p>
-                                <p className="whitespace-pre">{runResult[idx].stderr}</p>
-                            </div> :
-                            <div>
-                                <p className="whitespace-pre">Output: {runResult && runResult[idx].stdout}</p>
-                                <p className="whitespace-pre">Expected: {runResult && runResult[idx].expected_output}</p>
-                            </div>
-                        }
+            <ResizablePanelGroup
+                direction='vertical'
+                className='flex-1 min-h-0'
+            >
+                <ResizablePanel defaultSize={60}>
+                    <div className='flex flex-col h-full'>
+                        <div className='flex-1 min-h-0'>
+                            <Editor
+                                className='w-full h-full'
+                                language={language}
+                                theme='vs-dark'
+                                value={code}
+                                onChange={(v) => setCode(v || "")}
+                                options={{
+                                    fontSize: 16,
+                                    minimap: { enabled: false },
+                                    hover: { enabled: false },
+                                    quickSuggestions: false,
+                                    parameterHints: { enabled: false },
+                                    suggestOnTriggerCharacters: false,
+                                    acceptSuggestionOnEnter: "off",
+                                    tabCompletion: "off",
+                                    wordBasedSuggestions: "off",
+                                    suggest: {
+                                        snippetsPreventQuickSuggestions: false,
+                                    },
+                                    inlineSuggest: { enabled: false },
+                                }}
+                            />
+                        </div>
+                        <div className='flex justify-end pr-5 py-2 gap-5 items-center bg-editor-black'>
+                            <Button
+                                className='cursor-pointer'
+                                onClick={() => handleSubmission("run")}
+                            >
+                                Run
+                            </Button>
+                            <Button
+                                className='cursor-pointer'
+                                onClick={() => handleSubmission("submit")}
+                            >
+                                Submit
+                            </Button>
+                        </div>
                     </div>
-                ))
-            }
-            {submitResult && JSON.stringify(submitResult)}
+                </ResizablePanel>
+                <ResizableHandle className='bg-slate-900' withHandle />
+                <ResizablePanel defaultSize={40}>
+                    <div className='h-full overflow-y-auto pb-4 bg-dark-gray p-4 rounded-b-xl'>
+                        <div className='min-w-full bg-gray text-zinc-100 flex gap-2 mb-4 px-4 py-2 -mt-4 -mx-4'>
+                            <CodeXml className='text-dark-green' /> Test Result
+                        </div>
+                        {runResult &&
+                        (runResult[0].compile_output || runResult[0].stderr) ? (
+                            <div>
+                                <p className='text-dark-red font-bold text-xl'>
+                                    {runResult[0].status}
+                                </p>
+                                <div className='bg-dark-red/10 text-dark-red px-4 py-4 mt-6 rounded-md'>
+                                    {runResult[0].compile_output}
+                                    {runResult[0].stderr}
+                                </div>
+                            </div>
+                        ) : (
+                            <Tabs defaultValue='case-0' className='w-full'>
+                                <TabsList>
+                                    {problem.exampleTestcases.map((_, idx) => (
+                                        <TabsTrigger
+                                            className='cursor-pointer'
+                                            key={idx}
+                                            value={`case-${idx}`}
+                                        >
+                                            Case {idx + 1}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+
+                                {problem.exampleTestcases.map((p, idx) => (
+                                    <TabsContent
+                                        key={idx}
+                                        value={`case-${idx}`}
+                                        className='mt-4'
+                                    >
+                                        {runResult && (
+                                            <span
+                                                className={`font-semibold text-xl ${
+                                                    runResult[idx].status ===
+                                                    "Accepted"
+                                                        ? "text-dark-green"
+                                                        : "text-dark-red"
+                                                }`}
+                                            >
+                                                {runResult[idx].status}
+                                            </span>
+                                        )}
+                                        <p className='mt-2 mb-2 font-semibold text-zinc-200'>
+                                            Input:
+                                        </p>
+                                        <pre className='whitespace-pre bg-gray p-2 rounded text-white'>
+                                            {p.normalIO.input}
+                                        </pre>
+                                        {runResult && (
+                                            <div className='flex flex-col gap-4 mt-6'>
+                                                <div>
+                                                    <p className='font-semibold my-2 text-zinc-200'>
+                                                        Output
+                                                    </p>
+                                                    <div className='whitespace-pre bg-gray p-2 rounded text-white'>
+                                                        {runResult[idx].stdout}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <p className='font-semibold text-zinc-200 my-2'>
+                                                        Expected
+                                                    </p>
+                                                    <div className='whitespace-pre bg-gray p-2 rounded text-white'>
+                                                        {
+                                                            runResult[idx]
+                                                                .expected_output
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </TabsContent>
+                                ))}
+                            </Tabs>
+                        )}
+                    </div>
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </div>
-    </div>
+    );
 }

@@ -17,6 +17,8 @@ import {
 } from "./ui/resizable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Code, CodeXml } from "lucide-react";
+import { Spinner } from "./ui/spinner";
+import { useRouter } from "next/navigation";
 
 export function CodeEditor({ id }: { id: number }) {
     const [language, setLanguage] = useState<string>("java");
@@ -25,12 +27,16 @@ export function CodeEditor({ id }: { id: number }) {
     const [code, setCode] = useState<string>(boilerplate[language]);
     const [runResult, setRunResult] = useState<SubmissionDetails[]>();
     const [submitResult, setSubmitResult] = useState<SubmissionDetails[]>();
+    const [loading, setLoading] = useState(false);
+
     const socket = useSocket();
+    const router = useRouter();
 
     const apiKey = process.env.NEXT_PUBLIC_RAPID_API_KEY;
     const apiHost = process.env.NEXT_PUBLIC_RAPID_API_HOST;
 
     const handleSubmission = async (type: "run" | "submit") => {
+        setLoading(true);
         const testcases =
             type == "run" ? problem.exampleTestcases : problem.sampleTestcases;
         const submissions: SubmissionParameters[] = [];
@@ -43,7 +49,6 @@ export function CodeEditor({ id }: { id: number }) {
                 cpu_time_limit: 2,
             })
         );
-
         const options = {
             method: "POST",
             url: `https://${apiHost}/submissions/batch`,
@@ -76,13 +81,39 @@ export function CodeEditor({ id }: { id: number }) {
                             ? setRunResult(submissionResult)
                             : setSubmitResult(submissionResult);
                         if (type === "submit") {
-                            let status = true;
-                            submissionResult.forEach((s) => {
-                                if (s.status != "Accepted") status = false;
-                            });
-                            createSubmission(status);
+                            let status = "Accepted";
+                            let error: string = "";
+                            for (let i = 0; i < submissionResult.length; i++) {
+                                let s = submissionResult[i];
+                                if (s.status == "Wrong Answer") {
+                                    status = s.status;
+                                    error = JSON.stringify({
+                                        stdin: problem.sampleTestcases[i]
+                                            .normalIO.input,
+                                        expected_output: s.expected_output,
+                                        stdout: s.stdout,
+                                    });
+                                    break;
+                                } else if (s.status == "Compilation Error") {
+                                    status = s.status;
+                                    error = JSON.stringify({
+                                        compile_output: s.compile_output,
+                                    });
+                                    break;
+                                } else if (s.status == "Runtime Error (NZEC)") {
+                                    status = s.status;
+                                    error = JSON.stringify({
+                                        stderr: JSON.stringify({
+                                            stderr: s.stderr,
+                                        }),
+                                    });
+                                    break;
+                                }
+                            }
+                            createSubmission(status, error);
                         }
                     }
+                    setLoading(false);
                 } catch (err) {
                     toast.error("Error in submitting code");
                 }
@@ -90,15 +121,25 @@ export function CodeEditor({ id }: { id: number }) {
         }
     };
 
-    const createSubmission = async (status: boolean) => {
-        const response = await axios.post("/api/submission", {
-            language: language.toUpperCase(),
-            name: problem.title,
-            level: problem.level,
-            status: status ? "Accepted" : "Rejected",
-            topics: problem.topics,
-        });
-        console.log(response.data);
+    const createSubmission = async (status: string, error: string) => {
+        try {
+            const response = await axios.post("/api/submission", {
+                language: language.toUpperCase(),
+                name: problem.title,
+                level: problem.level,
+                status,
+                topics: problem.topics,
+                error,
+            });
+            const id = response.data.id;
+            router.push(
+                `/problem/${problem.title
+                    .replaceAll(" ", "-")
+                    .toLowerCase()}/submissions/${id}`
+            );
+        } catch (err) {
+            toast.error("Error in submitting the problem");
+        }
     };
 
     useEffect(() => {
@@ -150,18 +191,32 @@ export function CodeEditor({ id }: { id: number }) {
                             />
                         </div>
                         <div className='flex justify-end pr-5 py-2 gap-5 items-center bg-editor-black'>
-                            <Button
-                                className='cursor-pointer'
-                                onClick={() => handleSubmission("run")}
-                            >
-                                Run
-                            </Button>
-                            <Button
-                                className='cursor-pointer'
-                                onClick={() => handleSubmission("submit")}
-                            >
-                                Submit
-                            </Button>
+                            {loading ? (
+                                <Button
+                                    className='bg-dark-green px-4 py-2 font-semibold'
+                                    disabled
+                                >
+                                    <Spinner />
+                                    Pending
+                                </Button>
+                            ) : (
+                                <div className='flex gap-5'>
+                                    <Button
+                                        className='cursor-pointer bg-gray font-semibold hover:bg-gray/80'
+                                        onClick={() => handleSubmission("run")}
+                                    >
+                                        Run
+                                    </Button>
+                                    <Button
+                                        className='cursor-pointer bg-dark-green font-semibold hover:bg-dark-green/95'
+                                        onClick={() =>
+                                            handleSubmission("submit")
+                                        }
+                                    >
+                                        Submit
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </ResizablePanel>

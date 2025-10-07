@@ -2,7 +2,6 @@ import { User } from "@/app/generated/prisma";
 import { authOptions } from "@/lib/options";
 import { client } from "@/lib/prisma";
 import { submissionSchema } from "@/schema/submission";
-import { problems } from "@/utils/problems";
 import { getServerSession } from "next-auth";
 
 export async function POST(req: Request) {
@@ -18,18 +17,20 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { success, error, data } = submissionSchema.safeParse(body);
         if (success) {
-            await client.submissions.create({
+            const submission = await client.submissions.create({
                 data: {
                     language: data.language,
                     level: data.level,
                     name: data.name,
                     status: data.status,
                     topics: data.topics,
+                    error: data.error,
                     userId,
                 },
             });
             return Response.json({
                 message: "Code submitted successfully",
+                id: submission.id,
             });
         } else {
             return Response.json(

@@ -40,5 +40,6 @@ model Submissions {
   submittedAt          DateTime          @default(now())
   language             Language
   topics               String[]
+  error                String?
   user                 User              @relation(fields: [userId], references: [id])
 }

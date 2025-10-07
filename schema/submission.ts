@@ -7,4 +7,5 @@ export const submissionSchema = z.object({
     status: z.string(),
     language: z.enum(Language),
     topics: z.array(z.string()),
+    error: z.string().optional(),
 });

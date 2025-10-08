@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ChooseLanguage } from "./ui/ChooseLanguage";
 import Editor from "@monaco-editor/react";
-import { problems } from "@/utils/problems";
 import { Button } from "./ui/button";
 import { languageId } from "@/utils/language-id";
 import axios from "axios";
@@ -19,10 +18,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Code, CodeXml } from "lucide-react";
 import { Spinner } from "./ui/spinner";
 import { useRouter } from "next/navigation";
+import { ProblemType } from "@/types/Problem";
 
-export function CodeEditor({ id }: { id: number }) {
+export function CodeEditor({ problem }: { problem: ProblemType }) {
     const [language, setLanguage] = useState<string>("java");
-    const problem = problems[id - 1];
     const boilerplate: Record<string, string> = problem.boilerplate;
     const [code, setCode] = useState<string>(boilerplate[language]);
     const [runResult, setRunResult] = useState<SubmissionDetails[]>();

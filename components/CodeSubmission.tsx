@@ -10,17 +10,20 @@ import {
 } from "./ui/resizable";
 import { CodeEditor } from "./CodeEditor";
 import { toast } from "sonner";
-import { problems } from "@/utils/problems";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, History, NotebookPen } from "lucide-react";
+import { ProblemType } from "@/types/Problem";
+import { getProblems } from "@/utils/problems";
 
 export default function CodeSubmissionComponent({
     submissionId,
+    problem,
 }: {
     submissionId: number;
+    problem: ProblemType;
 }) {
     const [submissionDetails, setSubmissionDetails] = useState<Submissions>();
-    const [problem, setProblem] = useState<(typeof problems)[0]>();
+    const [problems, setProblems] = useState<ProblemType[]>();
     const [error, setError] = useState<any>();
 
     const router = useRouter();
@@ -31,10 +34,6 @@ export default function CodeSubmissionComponent({
         if (!response.data.submission) {
             toast.error(response.data.message);
         } else {
-            const problem = problems.find(
-                (p) => p.title == response.data.submission.name
-            );
-            if (problem) setProblem(problem);
             if (response.data.submission.status != "Accepted") {
                 setError(JSON.parse(response.data.submission.error));
             }
@@ -43,6 +42,11 @@ export default function CodeSubmissionComponent({
     };
 
     useEffect(() => {
+        async function fetchProblems() {
+            const data = await getProblems();
+            setProblems(data);
+        }
+        fetchProblems();
         fetchSubmission();
     }, []);
 
@@ -134,7 +138,7 @@ export default function CodeSubmissionComponent({
                 </ResizablePanel>
                 <ResizableHandle withHandle className='w-2 bg-black' />
                 <ResizablePanel defaultSize={50}>
-                    <CodeEditor id={problem.id} />
+                    <CodeEditor problem={problem} />
                 </ResizablePanel>
             </ResizablePanelGroup>
         )

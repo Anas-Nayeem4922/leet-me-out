@@ -1,6 +1,5 @@
 "use client";
 
-import { problems } from "@/utils/problems";
 import { usePathname, useRouter } from "next/navigation";
 import {
     DropdownMenu,
@@ -16,9 +15,9 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "./ui/accordion";
+import { ProblemType } from "@/types/Problem";
 
-export function ProblemDescription({ id }: { id: number }) {
-    const problem = problems[id - 1];
+export function ProblemDescription({ problem }: { problem: ProblemType }) {
     const constraints: string[] = problem.constraints.split(",");
     const router = useRouter();
     const pathName = usePathname();

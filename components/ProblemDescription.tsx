@@ -30,7 +30,13 @@ export function ProblemDescription({ problem }: { problem: ProblemType }) {
                     <span className='text-white font-bold'>Description</span>
                 </div>
                 <div
-                    onClick={() => router.push(`${pathName}/submissions`)}
+                    onClick={() =>
+                        router.push(
+                            `/problem/${problem.title
+                                .replaceAll(" ", "-")
+                                .toLowerCase()}/submissions`
+                        )
+                    }
                     className='flex gap-2 items-center cursor-pointer rounded-md hover:bg-orange-600/20 group px-4 py-2 transition-all duration-150'
                 >
                     <History className='h-5 w-5 text-orange-500/50' />

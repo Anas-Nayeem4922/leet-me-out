@@ -68,6 +68,9 @@ export async function GET(req: Request) {
                 userId,
                 name: title,
             },
+            orderBy: {
+                submittedAt: "desc",
+            },
         });
         return Response.json({
             message: submissions,

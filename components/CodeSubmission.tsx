@@ -11,7 +11,7 @@ import {
 import { CodeEditor } from "./CodeEditor";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, History, NotebookPen } from "lucide-react";
+import { ArrowLeft, Check, History, NotebookPen } from "lucide-react";
 import { ProblemType } from "@/types/Problem";
 import { getProblems } from "@/utils/problems";
 
@@ -60,7 +60,16 @@ export default function CodeSubmissionComponent({
                 <ResizablePanel defaultSize={50}>
                     <div className='h-screen bg-dark-gray rounded-xl p-4'>
                         <div className='bg-gray rounded-t-xl flex min-w-full -mt-4 -mx-4'>
-                            <div className='flex gap-2 items-center border-r-2 border-text-gray/30 rounded-xl px-4 py-2 cursor-pointer hover:bg-gray-700 transition-all duration-150'>
+                            <div
+                                className='flex gap-2 items-center border-r-2 border-text-gray/30 rounded-xl px-4 py-2 cursor-pointer hover:bg-gray-700 transition-all duration-150'
+                                onClick={() =>
+                                    router.push(
+                                        `/problem/${problem.title
+                                            .replaceAll(" ", "-")
+                                            .toLowerCase()}`
+                                    )
+                                }
+                            >
                                 <NotebookPen className='h-5 w-5 text-blue-500' />
                                 <span className='text-white font-bold'>
                                     Description
@@ -68,7 +77,11 @@ export default function CodeSubmissionComponent({
                             </div>
                             <div
                                 onClick={() =>
-                                    router.push(`${pathName}/submissions`)
+                                    router.push(
+                                        `/problem/${problem.title
+                                            .replaceAll(" ", "-")
+                                            .toLowerCase()}/submissions`
+                                    )
                                 }
                                 className='flex gap-2 items-center cursor-pointer rounded-md hover:bg-orange-600/20 group px-4 py-2 transition-all duration-150'
                             >
@@ -80,7 +93,16 @@ export default function CodeSubmissionComponent({
                         </div>
                         <div className='flex items-center gap-2 px-2 py-2 border-b-1 border-text-gray/30 min-w-full'>
                             <ArrowLeft className='h-4 w-4 text-zinc-300' />
-                            <div className='text-white cursor-pointer'>
+                            <div
+                                onClick={() =>
+                                    router.push(
+                                        `/problem/${problem.title
+                                            .replaceAll(" ", "-")
+                                            .toLowerCase()}/submissions`
+                                    )
+                                }
+                                className='text-white cursor-pointer'
+                            >
                                 All Submissions
                             </div>
                         </div>
@@ -95,8 +117,16 @@ export default function CodeSubmissionComponent({
                             {submissionDetails.status}
                         </div>
                         {submissionDetails.status === "Accepted" ? (
-                            <div className='bg-green-200 text-green-800 p-2 rounded'>
-                                ✅ Accepted
+                            <div className='flex gap-4 mt-6'>
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className='flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-lg bg-green-100 text-dark-green font-semibold'
+                                    >
+                                        Testcase {i + 1}{" "}
+                                        <Check className='w-4 h-4' />
+                                    </div>
+                                ))}
                             </div>
                         ) : submissionDetails.status === "Wrong Answer" ? (
                             <div>

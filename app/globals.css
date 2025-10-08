@@ -49,6 +49,7 @@
   --color-dark-green: #2cbb5d;
   --color-dark-red: #ef4743;
   --color-dark-gray: #262626;
+  --color-darker-gray: #282828;
   --color-gray: #353535;
   --color-black: #101010;
   --color-text-gray: #9fa0a2;
@@ -56,6 +57,7 @@
   --color-yellow-text: #ffb700;
   --color-red-text: #f63737;
   --color-editor-black: #1e1e1e;
+  --color-home-black: #171717;
 }
 
 :root {

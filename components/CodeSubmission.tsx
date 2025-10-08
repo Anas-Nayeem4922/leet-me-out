@@ -10,7 +10,7 @@ import {
 } from "./ui/resizable";
 import { CodeEditor } from "./CodeEditor";
 import { toast } from "sonner";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, History, NotebookPen } from "lucide-react";
 import { ProblemType } from "@/types/Problem";
 import { getProblems } from "@/utils/problems";
@@ -27,7 +27,6 @@ export default function CodeSubmissionComponent({
     const [error, setError] = useState<any>();
 
     const router = useRouter();
-    const pathName = usePathname();
 
     const fetchSubmission = async () => {
         const response = await axios.get(`/api/submission/${submissionId}`);

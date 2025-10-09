@@ -6,3 +6,7 @@ export async function getProblems() {
     );
     return response.data.p;
 }
+
+export const totalEasy = 1;
+export const totalMedium = 4;
+export const totalHard = 1;

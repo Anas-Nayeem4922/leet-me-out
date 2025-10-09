@@ -1,5 +1,8 @@
-import { Submissions } from "@/app/generated/prisma";
+import { Submissions, User } from "@/app/generated/prisma";
+import { authOptions } from "@/lib/options";
 import { client } from "@/lib/prisma";
+import { userSchema } from "@/schema/user";
+import { getServerSession } from "next-auth";
 
 export interface UserInfo {
     Easy: number;
@@ -65,7 +68,8 @@ export async function GET(req: Request) {
         return Response.json({
             message: "Success",
             userInfo,
-            submissions,
+            submissions: submissions.slice(0, 10),
+            user,
         });
     } catch (err) {
         return Response.json(
@@ -74,5 +78,50 @@ export async function GET(req: Request) {
             },
             { status: 500 }
         );
+    }
+}
+
+export async function POST(req: Request) {
+    const session = await getServerSession(authOptions);
+    const user: User = session?.user as User;
+    if (!session || !session.user) {
+        return Response.json({
+            message: "User not logged-in",
+        });
+    }
+    try {
+        const body = await req.json();
+        const { success, error, data } = userSchema.safeParse(body);
+        if (success) {
+            const userId = user.id;
+            await client.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    name: data.name,
+                    github: data.github,
+                    linkedin: data.linkedin,
+                    website: data.website,
+                    location: data.location,
+                    twitter: data.twitter,
+                    profileImage: data.github + ".png",
+                },
+            });
+            return Response.json({
+                message: "Profile Updated",
+            });
+        } else {
+            return Response.json(
+                {
+                    message: error,
+                },
+                { status: 411 }
+            );
+        }
+    } catch (err) {
+        return Response.json({
+            message: "Error in updating details",
+        });
     }
 }

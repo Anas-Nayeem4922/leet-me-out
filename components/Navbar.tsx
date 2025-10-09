@@ -9,13 +9,21 @@ import {
 } from "./ui/dropdown-menu";
 import Logo from "./ui/logo";
 import { Separator } from "./ui/separator";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
 export default function Navbar({ username }: { username: string | undefined }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const tabs = [
+        { name: "Explore", path: "/" },
+        { name: "Problems", path: "/problemset" },
+        { name: "Contests", path: "/contests" },
+        { name: "Discuss", path: "/discuss" },
+    ];
 
     return (
         <div className='w-full h-[7%] bg-darker-gray flex justify-between items-center px-6 border-b-2 border-text-gray/30 relative'>
@@ -24,18 +32,22 @@ export default function Navbar({ username }: { username: string | undefined }) {
                 <Logo />
                 {/* Desktop Nav */}
                 <div className='hidden md:flex items-center gap-6 h-full'>
-                    <div className='text-text-gray flex items-center h-full font-semibold hover:font-bold cursor-pointer hover:text-white transition-all duration-150'>
-                        Explore
-                    </div>
-                    <div className='flex items-center h-full font-bold cursor-pointer text-white border-b-2 border-white transition-all duration-150'>
-                        Problems
-                    </div>
-                    <div className='text-text-gray flex items-center h-full font-semibold hover:font-bold cursor-pointer hover:text-white transition-all duration-150'>
-                        Contests
-                    </div>
-                    <div className='text-text-gray flex items-center h-full font-semibold hover:font-bold cursor-pointer hover:text-white transition-all duration-150'>
-                        Discuss
-                    </div>
+                    {tabs.map((tab) => {
+                        const isActive = pathname === tab.path;
+                        return (
+                            <div
+                                key={tab.name}
+                                onClick={() => router.push(tab.path)}
+                                className={`flex items-center h-full cursor-pointer transition-all duration-150 ${
+                                    isActive
+                                        ? "font-bold text-white border-b-2 border-white"
+                                        : "text-text-gray font-semibold hover:font-bold hover:text-white"
+                                }`}
+                            >
+                                {tab.name}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -117,29 +129,42 @@ export default function Navbar({ username }: { username: string | undefined }) {
             {/* Mobile Menu */}
             {isMenuOpen && (
                 <div className='absolute top-full left-0 w-full bg-darker-gray flex flex-col items-start px-6 py-4 border-t border-text-gray/30 md:hidden z-50'>
-                    <div className='text-text-gray py-2 w-full font-semibold hover:font-bold cursor-pointer hover:text-white transition-all duration-150'>
-                        Explore
-                    </div>
-                    <div className='py-2 w-full font-bold cursor-pointer text-white hover:font-bold border-b border-white transition-all duration-150'>
-                        Problems
-                    </div>
-                    <div className='text-text-gray py-2 w-full font-semibold hover:font-bold cursor-pointer hover:text-white transition-all duration-150'>
-                        Contests
-                    </div>
-                    <div className='text-text-gray py-2 w-full font-semibold hover:font-bold cursor-pointer hover:text-white transition-all duration-150'>
-                        Discuss
-                    </div>
+                    {tabs.map((tab) => {
+                        const isActive = pathname === tab.path;
+                        return (
+                            <div
+                                key={tab.name}
+                                onClick={() => {
+                                    router.push(tab.path);
+                                    setIsMenuOpen(false);
+                                }}
+                                className={`py-3 px-3 w-full rounded-lg cursor-pointer transition-all duration-150 flex items-center ${
+                                    isActive
+                                        ? "bg-gray/40 border-l-4 border-white text-white font-bold"
+                                        : "text-text-gray font-semibold hover:bg-gray/20 hover:text-white hover:font-bold"
+                                }`}
+                            >
+                                {tab.name}
+                            </div>
+                        );
+                    })}
                     {!username && (
                         <div className='text-gray-400 py-2'>
                             <span
-                                onClick={() => router.push("/signup")}
+                                onClick={() => {
+                                    router.push("/signup");
+                                    setIsMenuOpen(false);
+                                }}
                                 className='hover:text-white transition-all duration-200 cursor-pointer'
                             >
                                 Register
                             </span>{" "}
                             &nbsp; or &nbsp;{" "}
                             <span
-                                onClick={() => router.push("/signin")}
+                                onClick={() => {
+                                    router.push("/signin");
+                                    setIsMenuOpen(false);
+                                }}
                                 className='hover:text-white transition-all duration-200 cursor-pointer'
                             >
                                 Log in

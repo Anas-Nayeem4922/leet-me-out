@@ -3,7 +3,7 @@ export default function Logo() {
         <div>
             <img
                 src='../../Logo.png'
-                className='h-10 w-10 rounded-lg mr-8'
+                className='h-10 w-11 rounded-lg mr-8'
                 alt='logo'
             />
         </div>

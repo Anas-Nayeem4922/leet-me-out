@@ -108,10 +108,14 @@ export async function POST(req: Request) {
                     profileImage: data.github + ".png",
                 },
             });
-            return Response.json({
-                message: "Profile Updated",
-            });
+            return Response.json(
+                {
+                    message: "Profile Updated",
+                },
+                { status: 200 }
+            );
         } else {
+            console.log(error);
             return Response.json(
                 {
                     message: error,
@@ -120,8 +124,11 @@ export async function POST(req: Request) {
             );
         }
     } catch (err) {
-        return Response.json({
-            message: "Error in updating details",
-        });
+        return Response.json(
+            {
+                message: "Error in updating details",
+            },
+            { status: 500 }
+        );
     }
 }

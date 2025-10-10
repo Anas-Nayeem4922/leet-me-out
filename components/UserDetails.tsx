@@ -1,3 +1,5 @@
+"use client";
+
 import { UserInfo } from "@/app/api/userDetails/route";
 import { User } from "@/app/generated/prisma";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
@@ -5,6 +7,7 @@ import { Separator } from "./ui/separator";
 import { CircleUser, Github, Linkedin, MapPin, Twitter } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { useRouter } from "next/navigation";
 
 export function UserDetails({
     userInfo,
@@ -13,6 +16,7 @@ export function UserDetails({
     userInfo: UserInfo;
     user: User;
 }) {
+    const router = useRouter();
     return (
         <div className='min-h-full bg-dark-gray rounded-xl p-6 min-w-[25%] shadow-xl/30'>
             {/* User card */}
@@ -36,7 +40,10 @@ export function UserDetails({
             </div>
             {/* Edit Profile */}
             <div>
-                <Button className='text-dark-green bg-dark-green/20 rounded-lg cursor-pointer mb-6 w-full font-semibold text-base hover:bg-dark-green/15 transition-all duration-150'>
+                <Button
+                    onClick={() => router.push("/profile")}
+                    className='text-dark-green bg-dark-green/20 rounded-lg cursor-pointer mb-6 w-full font-semibold text-base hover:bg-dark-green/15 transition-all duration-150'
+                >
                     Edit Profile
                 </Button>
             </div>

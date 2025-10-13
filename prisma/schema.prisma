@@ -50,3 +50,8 @@ model Submissions {
   error                String?
   user                 User              @relation(fields: [userId], references: [id])
 }
+
+model Problems {
+  id                  Int               @id
+  problem             Json            
+}

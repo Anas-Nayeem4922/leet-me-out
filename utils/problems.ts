@@ -1,12 +1,15 @@
 import axios from "axios";
 
-export async function getProblems() {
-    const response = await axios.get(
-        process.env.NEXT_PUBLIC_PROBLEM_URL || "http://localhost:3001"
-    );
-    return response.data.p;
-}
+let p: any[] = [];
 
-export const totalEasy = 1;
-export const totalMedium = 4;
-export const totalHard = 1;
+export async function getProblems() {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const response = await axios.get(`${baseUrl}/api/getAllProblems`);
+    const prob = response.data.problems;
+    const problems = prob.map((p: any) => ({
+        id: p.id,
+        ...p.problem,
+    }));
+    p = problems;
+    return problems;
+}

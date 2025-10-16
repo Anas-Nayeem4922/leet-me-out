@@ -108,7 +108,7 @@ const QuestionsProgress = ({ data }: QuestionsProgressProps) => {
                         stroke='currentColor'
                         strokeWidth={strokeWidth}
                         strokeLinecap='round'
-                        className='text-yellow-500/30'
+                        className='text-yellow-text/30'
                     />
                     <path
                         d={mediumProgressPath}
@@ -116,7 +116,7 @@ const QuestionsProgress = ({ data }: QuestionsProgressProps) => {
                         stroke='currentColor'
                         strokeWidth={strokeWidth}
                         strokeLinecap='round'
-                        className='text-yellow-500'
+                        className='text-yellow-text'
                     />
 
                     {/* Hard Section */}
@@ -154,7 +154,7 @@ const QuestionsProgress = ({ data }: QuestionsProgressProps) => {
             </div>
 
             {/* Difficulty Stats */}
-            <div className='flex flex-col gap-3'>
+            <div className='flex flex-col gap-3 mr-4 sm:mr-0'>
                 <div className='bg-gray py-1 rounded-md px-10'>
                     <div className='text-green-text text-sm font-medium mb-1 text-center'>
                         Easy

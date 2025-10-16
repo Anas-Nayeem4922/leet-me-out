@@ -8,6 +8,7 @@ import { CircleUser, Github, Linkedin, MapPin, Twitter } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export function UserDetails({
     userInfo,
@@ -17,8 +18,9 @@ export function UserDetails({
     user: User;
 }) {
     const router = useRouter();
+    const session = useSession();
     return (
-        <div className='min-h-full bg-dark-gray rounded-xl p-6 min-w-[25%] shadow-xl/30'>
+        <div className='bg-dark-gray rounded-xl p-6 min-w-[25%] shadow-xl/30 mt-[28rem] lg:mt-0'>
             {/* User card */}
             <div className='flex gap-5 mb-4'>
                 <Avatar>
@@ -39,14 +41,16 @@ export function UserDetails({
                 </div>
             </div>
             {/* Edit Profile */}
-            <div>
-                <Button
-                    onClick={() => router.push("/profile")}
-                    className='text-dark-green bg-dark-green/20 rounded-lg cursor-pointer mb-6 w-full font-semibold text-base hover:bg-dark-green/15 transition-all duration-150'
-                >
-                    Edit Profile
-                </Button>
-            </div>
+            {session.data?.user.username === user.username && (
+                <div>
+                    <Button
+                        onClick={() => router.push("/profile")}
+                        className='text-dark-green bg-dark-green/20 rounded-lg cursor-pointer mb-6 w-full font-semibold text-base hover:bg-dark-green/15 transition-all duration-150'
+                    >
+                        Edit Profile
+                    </Button>
+                </div>
+            )}
             {/* User Profile */}
             <div className='flex flex-col gap-3 text-gray-400 mb-6'>
                 {/* location, website, github, linkedin, twitter */}

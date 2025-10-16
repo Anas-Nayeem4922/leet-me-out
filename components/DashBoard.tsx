@@ -35,7 +35,7 @@ export default function DashBoard({ username }: { username: string }) {
         <div className='h-screen w-full flex flex-col bg-home-black pb-8'>
             <Navbar username={username} />
             {userInfo && user && submissions && (
-                <div className='h-full overflow-y-scroll flex justify-center gap-4 p-5'>
+                <div className='h-full overflow-y-scroll flex flex-col lg:flex-row justify-center gap-4 p-5'>
                     <UserDetails userInfo={userInfo} user={user} />
                     <UserStats userInfo={userInfo} submissions={submissions} />
                 </div>

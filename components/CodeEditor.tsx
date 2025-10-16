@@ -19,6 +19,7 @@ import { Code, CodeXml } from "lucide-react";
 import { Spinner } from "./ui/spinner";
 import { useRouter } from "next/navigation";
 import { ProblemType } from "@/types/Problem";
+import { useSession } from "next-auth/react";
 
 export function CodeEditor({ problem }: { problem: ProblemType }) {
     const [language, setLanguage] = useState<string>("java");
@@ -30,6 +31,7 @@ export function CodeEditor({ problem }: { problem: ProblemType }) {
 
     const socket = useSocket();
     const router = useRouter();
+    const session = useSession();
 
     const apiKey = process.env.NEXT_PUBLIC_RAPID_API_KEY;
     const apiHost = process.env.NEXT_PUBLIC_RAPID_API_HOST;
@@ -189,34 +191,54 @@ export function CodeEditor({ problem }: { problem: ProblemType }) {
                                 }}
                             />
                         </div>
-                        <div className='flex justify-end pr-5 py-2 gap-5 items-center bg-editor-black'>
-                            {loading ? (
-                                <Button
-                                    className='bg-dark-green px-4 py-2 font-semibold'
-                                    disabled
+                        {session.data && session.data.user ? (
+                            <div className='flex justify-end pr-5 py-2 gap-5 items-center bg-editor-black'>
+                                {loading ? (
+                                    <Button
+                                        className='bg-dark-green px-4 py-2 font-semibold'
+                                        disabled
+                                    >
+                                        <Spinner />
+                                        Pending
+                                    </Button>
+                                ) : (
+                                    <div className='flex gap-5'>
+                                        <Button
+                                            className='cursor-pointer bg-gray font-semibold hover:bg-gray/80'
+                                            onClick={() =>
+                                                handleSubmission("run")
+                                            }
+                                        >
+                                            Run
+                                        </Button>
+                                        <Button
+                                            className='cursor-pointer bg-dark-green font-semibold hover:bg-dark-green/95'
+                                            onClick={() =>
+                                                handleSubmission("submit")
+                                            }
+                                        >
+                                            Submit
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className='flex py-2 pl-4 text-gray-300'>
+                                <span
+                                    onClick={() => router.push("/signup")}
+                                    className='hover:text-white transition-all duration-200 cursor-pointer'
                                 >
-                                    <Spinner />
-                                    Pending
-                                </Button>
-                            ) : (
-                                <div className='flex gap-5'>
-                                    <Button
-                                        className='cursor-pointer bg-gray font-semibold hover:bg-gray/80'
-                                        onClick={() => handleSubmission("run")}
-                                    >
-                                        Run
-                                    </Button>
-                                    <Button
-                                        className='cursor-pointer bg-dark-green font-semibold hover:bg-dark-green/95'
-                                        onClick={() =>
-                                            handleSubmission("submit")
-                                        }
-                                    >
-                                        Submit
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+                                    Register
+                                </span>{" "}
+                                &nbsp; or &nbsp;{" "}
+                                <span
+                                    onClick={() => router.push("/signin")}
+                                    className='hover:text-white transition-all duration-200 cursor-pointer'
+                                >
+                                    Log in
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </ResizablePanel>
                 <ResizableHandle className='bg-slate-900' withHandle />

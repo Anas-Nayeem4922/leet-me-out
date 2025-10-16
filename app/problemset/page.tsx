@@ -19,7 +19,7 @@ export default function Problemset() {
         fetchProblems();
     }, []);
     return (
-        <div className='bg-home-black w-full h-screen'>
+        <div className='bg-home-black w-full h-screen overflow-y-scroll'>
             <Navbar username={session.data?.user.username} />
             <div className='px-5 py-10 flex flex-col gap-1'>
                 {problems &&

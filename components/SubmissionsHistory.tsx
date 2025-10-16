@@ -8,7 +8,7 @@ export default function SubmissionsHistory({
 }) {
     return (
         <div className='bg-dark-gray p-4 flex flex-col gap-3 rounded-lg shadow-xl/30 min-h-full'>
-            <div className='text-lg text-zinc-300 font-bold mb-4'>
+            <div className='text-base md:text-lg text-zinc-300 font-bold mb-4'>
                 Recent Submissions
             </div>
             {submissions.map((s, idx) => {
@@ -24,7 +24,7 @@ export default function SubmissionsHistory({
                         }`}
                         key={idx}
                     >
-                        <span className='text-white font-semibold text-lg'>
+                        <span className='text-white font-semibold text-sm sm:text-base md:text-lg'>
                             {s.name}
                         </span>
                         <span className='text-text-gray'>{timeElapsed}</span>

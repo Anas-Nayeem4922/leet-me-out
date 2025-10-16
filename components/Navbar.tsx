@@ -39,7 +39,7 @@ export default function Navbar({ username }: { username: string | undefined }) {
     }, [username]);
 
     return (
-        <div className='w-full h-[7%] bg-darker-gray flex justify-between items-center px-6 border-b-2 border-text-gray/30 relative py-2 z-50'>
+        <div className='w-full h-[7%] bg-darker-gray flex justify-between items-center px-6 border-b-2 border-text-gray/30 sticky top-0 py-2 z-50'>
             {/* Left Section */}
             <div className='flex items-center gap-6 h-full'>
                 <Logo />
